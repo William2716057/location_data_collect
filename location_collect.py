@@ -8,7 +8,9 @@ import os
 
 clicked_coords = []
 current_marker = None        
-saved_data = []
+#saved_data = []
+csv_markers = []
+csv_markers_visible = False
 
 
 def add_location(coords):
@@ -36,13 +38,7 @@ def add_location(coords):
     lon_var.set(f"{lon:.8f}")
     count_var.set(str(len(clicked_coords))) 
     date_var.set(today)
-    #today = str(date.today())
-    #now = datetime.now().strftime("%H:%M:%S")
     time_var.set(now)
-    
-
-    #date_var.set(today)
-    #date_var.set(str(date.today()))
  
     # Append to the history list
     history_list.insert(0, f"{len(clicked_coords):>3}.  {lat:.6f},  {lon:.6f} {today} {now}") #add here
@@ -69,21 +65,39 @@ def save_to_csv():
 
     save_btn.config(text="Saved!")
     root.after(1500, lambda: save_btn.config(text="Add to CSV"))
-#read last count number and continue from there (set count from highest in CSV)
+    
+def show_all_from_csv():
+    global csv_markers_visible
 
-#def copy_last(): #remove feature
+    if csv_markers_visible:
+        for m in csv_markers:
+            m.delete()
+        csv_markers.clear()
+        show_all_btn.config(text="Show all location history")
+        csv_markers_visible = False
+        return
 
-#    if not clicked_coords:
- #       return
-    #lat, lon = clicked_coords[-1]
-#    lat, lon, today, now = clicked_coords[-1] #add here
-#    text = f"{lat:.8f}, {lon:.8f}"
-#    root.clipboard_clear()
-#    root.clipboard_append(text)
-#    copy_btn.config(text="Copied!")
-#    root.after(1500, lambda: copy_btn.config(text="Copy"))
- 
- 
+    file = "locations.csv"
+    if not os.path.exists(file):
+        return
+
+    for m in csv_markers:
+        m.delete()
+    csv_markers.clear()
+
+    with open(file, "r", newline="") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            lat, lon = float(row["Latitude"]), float(row["Longitude"])
+            m = map_widget.set_marker(lat, lon,
+                marker_color_circle="#22c55e",
+                marker_color_outside="#15803d",
+                text="")
+            csv_markers.append(m)
+
+    show_all_btn.config(text="Hide location history")
+    csv_markers_visible = True
+
 def clear_all(): 
 
     global current_marker
@@ -160,18 +174,12 @@ ttk.Separator(left, orient="horizontal").pack(fill=tk.X, padx=16, pady=12)
 btn_style = {"font": ("Courier", 10, "bold"), "relief": "flat",
              "cursor": "hand2", "pady": 7}
  
-#copy_btn = tk.Button(left, text="Copy", bg="#3b82f6", fg="white",
-#                     activebackground="#2563eb", activeforeground="white",
-#                     command=copy_last, **btn_style)
-#copy_btn.pack(fill=tk.X, padx=16, pady=(0, 6))
-
 save_btn = tk.Button(left, text="Save CSV", bg="#16a34a", fg="white",
                      activebackground="#15803d", activeforeground="white",
                      command=save_to_csv, **btn_style)
 save_btn.pack(fill=tk.X, padx=16, pady=(0, 6))
 
 
- 
 tk.Button(left, text="Clear all", bg="#334155", fg="#cbd5e1",
           activebackground="#475569", activeforeground="white",
           command=clear_all, **btn_style).pack(fill=tk.X, padx=16)
@@ -213,6 +221,11 @@ map_widget.set_zoom(15)
 
 map_widget.add_left_click_map_command(add_location)
 
+show_all_btn = tk.Button(right, text="Show all location history", bg="#14532d", fg="#86efac",
+          activebackground="#15803d", activeforeground="white",
+          font=("Courier", 10, "bold"), relief="flat", cursor="hand2",
+          command=show_all_from_csv)
+show_all_btn.pack(fill=tk.X, pady=(6, 0))
 
 root.mainloop()
  
