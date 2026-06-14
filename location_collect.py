@@ -66,6 +66,7 @@ def save_to_csv():
     save_btn.config(text="Saved!")
     root.after(1500, lambda: save_btn.config(text="Add to CSV"))
     
+#filters 
 def show_all_from_csv():
     global csv_markers_visible
 
@@ -97,6 +98,45 @@ def show_all_from_csv():
 
     show_all_btn.config(text="Hide location history")
     csv_markers_visible = True
+
+def show_by_date():
+    global date_filter_visible, date_filter_markers
+
+    if date_filter_visible:
+        for m in date_filter_markers:
+            m.delete()
+        date_filter_markers.clear()
+        date_entry_frame.pack_forget()
+        show_all_btn.pack(fill=tk.X, pady=(6, 0))
+        date_filter_btn.config(text="Show by date")
+        date_filter_visible = False
+        return
+
+    show_all_btn.pack_forget()
+    date_entry_frame.pack(fill=tk.X, pady=(6, 0))
+    date_filter_btn.config(text="Hide date filter")
+    date_filter_visible = True
+
+def apply_date_filter():
+    for m in date_filter_markers:
+        m.delete()
+    date_filter_markers.clear()
+
+    target = date_entry.get().strip()
+    file = "locations.csv"
+    if not os.path.exists(file):
+        return
+
+    with open(file, "r", newline="") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if row["Date"] == target:
+                lat, lon = float(row["Latitude"]), float(row["Longitude"])
+                m = map_widget.set_marker(lat, lon,
+                    marker_color_circle="#f59e0b",
+                    marker_color_outside="#b45309",
+                    text="")
+                date_filter_markers.append(m)
 
 def clear_all(): 
 
@@ -187,6 +227,8 @@ tk.Button(left, text="Clear all", bg="#334155", fg="#cbd5e1",
 tk.Button(left, text="Clear selected", bg="#7f1d1d", fg="#fca5a5",
           activebackground="#991b1b", activeforeground="white",
           command=clear_selected, **btn_style).pack(fill=tk.X, padx=16, pady=(6, 0))
+
+
 
  
 ttk.Separator(left, orient="horizontal").pack(fill=tk.X, padx=16, pady=12)
