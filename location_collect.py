@@ -97,7 +97,17 @@ def clear_all():
     time_var.set("-")
     history_list.delete(0, tk.END)
  
-#def clear_selected(): 
+def clear_selected():
+    selected = history_list.curselection()
+    if not selected:
+        return
+    
+    for i in reversed(selected):
+        history_list.delete(i)
+        
+        coord_index = len(clicked_coords) -1 -i
+        del clicked_coords[coord_index]
+    
 
 root = tk.Tk()
 root.title("Map Click Geocoordinates")
@@ -165,6 +175,11 @@ save_btn.pack(fill=tk.X, padx=16, pady=(0, 6))
 tk.Button(left, text="Clear all", bg="#334155", fg="#cbd5e1",
           activebackground="#475569", activeforeground="white",
           command=clear_all, **btn_style).pack(fill=tk.X, padx=16)
+
+tk.Button(left, text="Clear selected", bg="#7f1d1d", fg="#fca5a5",
+          activebackground="#991b1b", activeforeground="white",
+          command=clear_selected, **btn_style).pack(fill=tk.X, padx=16, pady=(6, 0))
+
  
 ttk.Separator(left, orient="horizontal").pack(fill=tk.X, padx=16, pady=12)
  
