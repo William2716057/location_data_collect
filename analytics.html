@@ -1,810 +1,778 @@
-﻿<!DOCTYPE html> <!--separate css and html pages-->
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geocoordinate Analytics</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Inter:wght@300;400;500&display=swap');
-
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        :root {
-            --bg: #0a0f1a;
-            --surface: #111827;
-            --surface2: #1a2235;
-            --border: #1e2d45;
-            --accent: #3b82f6;
-            --accent2: #06b6d4;
-            --green: #22c55e;
-            --amber: #f59e0b;
-            --text: #e2e8f0;
-            --muted: #64748b;
-            --mono: 'JetBrains Mono', monospace;
-            --sans: 'Inter', sans-serif;
-        }
-
-        html, body {
-            height: 100%;
-            background: var(--bg);
-            color: var(--text);
-            font-family: var(--sans);
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        /*  Layout  */
-        .shell {
-            display: grid;
-            grid-template-rows: 52px 1fr;
-            grid-template-columns: 220px 1fr;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /*  Topbar  */
-        .topbar {
-            grid-column: 1 / -1;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            gap: 12px;
-        }
-
-            .topbar .wordmark {
-                font-family: var(--mono);
-                font-size: 13px;
-                font-weight: 700;
-                color: var(--accent);
-                letter-spacing: 0.08em;
-                text-transform: uppercase;
-            }
-
-            .topbar .divider {
-                width: 1px;
-                height: 20px;
-                background: var(--border);
-            }
-
-            .topbar .subtitle {
-                font-family: var(--mono);
-                font-size: 11px;
-                color: var(--muted);
-                letter-spacing: 0.05em;
-            }
-
-            .topbar .spacer {
-                flex: 1;
-            }
-
-            .topbar .status {
-                display: flex;
-                align-items: center;
-                gap: 6px;
-                font-family: var(--mono);
-                font-size: 11px;
-                color: var(--muted);
-            }
-
-        .status-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--green);
-            box-shadow: 0 0 6px var(--green);
-        }
-
-        /*  Sidebar  */
-        .sidebar {
-            background: var(--surface);
-            border-right: 1px solid var(--border);
-            padding: 20px 0;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            overflow-y: auto;
-        }
-
-        .sidebar-label {
-            font-family: var(--mono);
-            font-size: 10px;
-            color: var(--muted);
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            padding: 12px 20px 6px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 9px 20px;
-            font-size: 13px;
-            color: var(--muted);
-            cursor: pointer;
-            border-left: 2px solid transparent;
-            transition: all 0.15s;
-            user-select: none;
-        }
-
-            .nav-item:hover {
-                color: var(--text);
-                background: var(--surface2);
-            }
-
-            .nav-item.active {
-                color: var(--accent);
-                border-left-color: var(--accent);
-                background: rgba(59,130,246,0.07);
-            }
-
-            .nav-item .icon {
-                font-size: 15px;
-                width: 18px;
-                text-align: center;
-            }
-
-            .nav-item .badge {
-                margin-left: auto;
-                background: var(--surface2);
-                border: 1px solid var(--border);
-                color: var(--muted);
-                font-family: var(--mono);
-                font-size: 10px;
-                padding: 1px 6px;
-                border-radius: 3px;
-            }
-
-            .nav-item.active .badge {
-                background: rgba(59,130,246,0.15);
-                border-color: rgba(59,130,246,0.3);
-                color: var(--accent);
-            }
-
-        .sidebar-sep {
-            height: 1px;
-            background: var(--border);
-            margin: 10px 0;
-        }
-
-        .back-btn { 
-            margin: auto 16px 0;
-            padding: 9px 14px;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--muted);
-            font-family: var(--mono);
-            font-size: 11px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.15s;
-        }
-
-            .back-btn:hover {
-                color: var(--text);
-                border-color: var(--accent);
-            }
-
-        /*  Main content  */
-        .main {
-            overflow-y: auto;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        /*  Panel header  */
-        .panel-header {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            margin-bottom: 4px;
-        }
-
-        .panel-title {
-            font-family: var(--mono);
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--muted);
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
-
-        .panel-action {
-            font-family: var(--mono);
-            font-size: 10px;
-            color: var(--accent);
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 0;
-        }
-
-            .panel-action:hover {
-                text-decoration: underline;
-            }
-
-        /*  Stat cards  */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-        }
-
-        .stat-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 16px 18px;
-            position: relative;
-            overflow: hidden;
-        }
-
-            .stat-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 2px;
-                background: var(--accent-color, var(--accent));
-            }
-
-            .stat-card .label {
-                font-family: var(--mono);
-                font-size: 10px;
-                color: var(--muted);
-                letter-spacing: 0.08em;
-                text-transform: uppercase;
-                margin-bottom: 8px;
-            }
-
-            .stat-card .value {
-                font-family: var(--mono);
-                font-size: 28px;
-                font-weight: 700;
-                color: var(--text);
-                line-height: 1;
-            }
-
-            .stat-card .sub {
-                font-size: 11px;
-                color: var(--muted);
-                margin-top: 6px;
-            }
-
-        /*  Map placeholder  */
-        .map-panel {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .map-toolbar {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 14px;
-            border-bottom: 1px solid var(--border);
-            background: var(--surface2);
-        }
-
-            .map-toolbar .panel-title {
-                margin: 0;
-            }
-
-            .map-toolbar .spacer {
-                flex: 1;
-            }
-
-        .viz-toggle {
-            display: flex;
-            gap: 4px;
-        }
-
-        .viz-btn {
-            padding: 5px 12px;
-            font-family: var(--mono);
-            font-size: 10px;
-            letter-spacing: 0.05em;
-            border-radius: 4px;
-            border: 1px solid var(--border);
-            background: none;
-            color: var(--muted);
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-
-            .viz-btn:hover {
-                color: var(--text);
-                border-color: var(--muted);
-            }
-
-            .viz-btn.active {
-                background: var(--accent);
-                border-color: var(--accent);
-                color: white;
-            }
-
-        .map-placeholder {
-            height: 380px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            color: var(--muted);
-            position: relative;
-            background: radial-gradient(ellipse at 30% 40%, rgba(59,130,246,0.04) 0%, transparent 60%), radial-gradient(ellipse at 70% 60%, rgba(6,182,212,0.03) 0%, transparent 60%);
-        }
-
-            /* Grid overlay for empty map feel */
-            .map-placeholder::before {
-                content: '';
-                position: absolute;
-                inset: 0;
-                background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
-                background-size: 40px 40px;
-                opacity: 0.4;
-            }
-
-            .map-placeholder .inner {
-                position: relative;
-                text-align: center;
-                z-index: 1;
-            }
-
-            .map-placeholder .placeholder-icon {
-                font-size: 32px;
-                margin-bottom: 10px;
-                opacity: 0.4;
-            }
-
-            .map-placeholder .placeholder-text {
-                font-family: var(--mono);
-                font-size: 12px;
-                color: var(--muted);
-                letter-spacing: 0.05em;
-            }
-
-            .map-placeholder .placeholder-sub {
-                font-size: 11px;
-                color: var(--border);
-                margin-top: 4px;
-            }
-
-        /*  Bottom row  */
-        .bottom-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        /*  Chart placeholder  */
-        .chart-panel {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .chart-header {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .chart-body {
-            height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--muted);
-            font-family: var(--mono);
-            font-size: 11px;
-            letter-spacing: 0.05em;
-            flex-direction: column;
-            gap: 8px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Fake bar chart silhouette */
-        .fake-bars {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 100%;
-            display: flex;
-            align-items: flex-end;
-            gap: 6px;
-            padding: 0 20px 20px;
-            opacity: 0.08;
-        }
-
-        .fake-bar {
-            flex: 1;
-            background: var(--accent);
-            border-radius: 3px 3px 0 0;
-            min-height: 8px;
-        }
-
-        .chart-empty {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-        }
-
-        /*  Data table  */
-        .table-panel {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .table-header {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: var(--mono);
-            font-size: 11px;
-        }
-
-        thead th {
-            padding: 8px 16px;
-            text-align: left;
-            color: var(--muted);
-            font-weight: 600;
-            letter-spacing: 0.07em;
-            text-transform: uppercase;
-            border-bottom: 1px solid var(--border);
-            background: var(--surface2);
-            font-size: 10px;
-        }
-
-        tbody tr {
-            border-bottom: 1px solid var(--border);
-            transition: background 0.1s;
-        }
-
-            tbody tr:last-child {
-                border-bottom: none;
-            }
-
-            tbody tr:hover {
-                background: var(--surface2);
-            }
-
-        tbody td {
-            padding: 9px 16px;
-            color: var(--text);
-        }
-
-            tbody td.muted {
-                color: var(--muted);
-            }
-
-        .dot {
-            display: inline-block;
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            margin-right: 6px;
-            vertical-align: middle;
-        }
-
-        /* ── Import bar ── */
-        .import-bar {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 14px 18px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-            .import-bar .label {
-                font-family: var(--mono);
-                font-size: 11px;
-                color: var(--muted);
-                letter-spacing: 0.05em;
-                white-space: nowrap;
-            }
-
-        .file-input-wrap {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .file-path {
-            flex: 1;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 5px;
-            padding: 7px 12px;
-            font-family: var(--mono);
-            font-size: 11px;
-            color: var(--muted);
-        }
-
-        .btn {
-            padding: 8px 16px;
-            font-family: var(--mono);
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.15s;
-            white-space: nowrap;
-        }
-
-        .btn-primary {
-            background: var(--accent);
-            color: white;
-        }
-
-            .btn-primary:hover {
-                background: #2563eb;
-            }
-
-        .btn-ghost {
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            color: var(--muted);
-        }
-
-            .btn-ghost:hover {
-                color: var(--text);
-                border-color: var(--muted);
-            }
-
-        /* ── Scrollbar ── */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 3px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geocoordinate Analytics</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Inter:wght@300;400;500&display=swap');
+ 
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+  :root {
+    --bg:         #0a0f1a;
+    --surface:    #111827;
+    --surface2:   #1a2235;
+    --border:     #1e2d45;
+    --accent:     #3b82f6;
+    --accent2:    #06b6d4;
+    --green:      #22c55e;
+    --amber:      #f59e0b;
+    --text:       #e2e8f0;
+    --muted:      #64748b;
+    --mono:       'JetBrains Mono', monospace;
+    --sans:       'Inter', sans-serif;
+  }
+ 
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+ 
+  /* ── Layout ── */
+  .shell {
+    display: grid;
+    grid-template-rows: 52px 1fr;
+    grid-template-columns: 220px 1fr;
+    height: 100vh;
+    overflow: hidden;
+  }
+ 
+  /* ── Topbar ── */
+  .topbar {
+    grid-column: 1 / -1;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 12px;
+  }
+ 
+  .topbar .wordmark {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+ 
+  .topbar .divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+  }
+ 
+  .topbar .subtitle {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+ 
+  .topbar .spacer { flex: 1; }
+ 
+  .topbar .status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+ 
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+  }
+ 
+  /* ── Sidebar ── */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+  }
+ 
+  .sidebar-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 12px 20px 6px;
+  }
+ 
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+    user-select: none;
+  }
+ 
+  .nav-item:hover { color: var(--text); background: var(--surface2); }
+ 
+  .nav-item.active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: rgba(59,130,246,0.07);
+  }
+ 
+  .nav-item .icon {
+    font-size: 15px;
+    width: 18px;
+    text-align: center;
+  }
+ 
+  .nav-item .badge {
+    margin-left: auto;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+ 
+  .nav-item.active .badge {
+    background: rgba(59,130,246,0.15);
+    border-color: rgba(59,130,246,0.3);
+    color: var(--accent);
+  }
+ 
+  .sidebar-sep {
+    height: 1px;
+    background: var(--border);
+    margin: 10px 0;
+  }
+ 
+  .back-btn {
+    margin: auto 16px 0;
+    padding: 9px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+ 
+  .back-btn:hover { color: var(--text); border-color: var(--accent); }
+ 
+  /* ── Main content ── */
+  .main {
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+ 
+  /* ── Panel header ── */
+  .panel-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+ 
+  .panel-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+ 
+  .panel-action {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+ 
+  .panel-action:hover { text-decoration: underline; }
+ 
+  /* ── Stat cards ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+ 
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+  }
+ 
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent-color, var(--accent));
+  }
+ 
+  .stat-card .label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+ 
+  .stat-card .value {
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+ 
+  .stat-card .sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+ 
+  /* ── Map placeholder ── */
+  .map-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+  }
+ 
+  .map-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+ 
+  .map-toolbar .panel-title { margin: 0; }
+ 
+  .map-toolbar .spacer { flex: 1; }
+ 
+  .viz-toggle {
+    display: flex;
+    gap: 4px;
+  }
+ 
+  .viz-btn {
+    padding: 5px 12px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+ 
+  .viz-btn:hover { color: var(--text); border-color: var(--muted); }
+  .viz-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+ 
+  .map-placeholder {
+    height: 380px;
+    position: relative;
+  }
+ 
+  #map {
+    height: 100%;
+    width: 100%;
+  }
+ 
+  /* Dark tile filter to match theme */
+  #map {
+    filter: brightness(0.85) contrast(1.05);
+  }
+ 
+  .map-empty-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: var(--surface);
+    z-index: 500;
+    pointer-events: none;
+  }
+ 
+  /* ── Bottom row ── */
+  .bottom-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+ 
+  /* ── Chart placeholder ── */
+  .chart-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+ 
+  .chart-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+ 
+  .chart-body {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+ 
+  /* Fake bar chart silhouette */
+  .fake-bars {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    padding: 0 20px 20px;
+    opacity: 0.08;
+  }
+ 
+  .fake-bar {
+    flex: 1;
+    background: var(--accent);
+    border-radius: 3px 3px 0 0;
+    min-height: 8px;
+  }
+ 
+  .chart-empty {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+ 
+  /* ── Data table ── */
+  .table-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+ 
+  .table-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+ 
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+ 
+  thead th {
+    padding: 8px 16px;
+    text-align: left;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+    font-size: 10px;
+  }
+ 
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+ 
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+ 
+  tbody td {
+    padding: 9px 16px;
+    color: var(--text);
+  }
+ 
+  tbody td.muted { color: var(--muted); }
+ 
+  .dot {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+ 
+  /* ── Import bar ── */
+  .import-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+ 
+  .import-bar .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+ 
+  .file-input-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+ 
+  .file-path {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 7px 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+ 
+  .btn {
+    padding: 8px 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+ 
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+ 
+  .btn-primary:hover { background: #2563eb; }
+ 
+  .btn-ghost {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+ 
+  .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+ 
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
 </head>
 <body>
-
-    <div class="shell">
-
-        <!-- Topbar -->
-        <header class="topbar">
-            <span class="wordmark">GeoTrack</span>
-            <div class="divider"></div>
-            <span class="subtitle">Analytics</span>
-            <div class="spacer"></div>
-            <div class="status">
-                <span class="status-dot"></span>
-                No data loaded
-            </div>
-        </header>
-
-        <!-- Sidebar -->
-        <nav class="sidebar">
-            <div class="sidebar-label">Visualise</div>
-
-            <div class="nav-item active" onclick="setActive(this)">
-                <span class="icon">🗺</span>
-                Heatmap
-                <span class="badge">soon</span>
-            </div>
-
-            <div class="nav-item" onclick="setActive(this)">
-                <span class="icon">📍</span>
-                Point map
-                <span class="badge">soon</span>
-            </div>
-
-            <div class="nav-item" onclick="setActive(this)">
-                <span class="icon">🔵</span>
-                Cluster map
-                <span class="badge">soon</span>
-            </div>
-
-            <div class="sidebar-sep"></div>
-            <div class="sidebar-label">Analyse</div>
-
-            <div class="nav-item" onclick="setActive(this)">
-                <span class="icon">📅</span>
-                By date
-                <span class="badge">soon</span>
-            </div>
-
-            <div class="nav-item" onclick="setActive(this)">
-                <span class="icon">⏱</span>
-                By time of day
-                <span class="badge">soon</span>
-            </div>
-
-            <div class="nav-item" onclick="setActive(this)">
-                <span class="icon">📊</span>
-                Frequency
-                <span class="badge">soon</span>
-            </div>
-
-            <div class="sidebar-sep"></div>
-            <div class="sidebar-label">Data</div>
-
-            <div class="nav-item" onclick="setActive(this)">
-                <span class="icon">📋</span>
-                All records
-            </div>
-
-            <div class="nav-item" onclick="setActive(this)">
-                <span class="icon">⬇</span>
-                Export
-                <span class="badge">soon</span>
-            </div>
-
-            <div class="back-btn" onclick="window.close()">← Back to app</div>
-        </nav>
-
-        <!-- Main -->
-        <main class="main">
-
-            <!-- Import bar -->
-            <div class="import-bar">
-                <span class="label">CSV FILE</span>
-                <div class="file-input-wrap">
-                    <div class="file-path">locations.csv</div>
-                    <button class="btn btn-ghost" onclick="document.getElementById('csvInput').click()">Browse</button>
-                    <input id="csvInput" type="file" accept=".csv" style="display:none" onchange="handleFile(this)">
-                    <button class="btn btn-primary" onclick="loadData()">Load</button>
-                </div>
-            </div>
-
-            <!-- Stat cards -->
-            <div class="stats-row">
-                <div class="stat-card" style="--accent-color: #3b82f6">
-                    <div class="label">Total points</div>
-                    <div class="value" id="stat-total">—</div>
-                    <div class="sub">from CSV</div>
-                </div>
-                <div class="stat-card" style="--accent-color: #22c55e">
-                    <div class="label">Date range</div>
-                    <div class="value" id="stat-dates" style="font-size:14px; padding-top:8px">—</div>
-                    <div class="sub" id="stat-days">—</div>
-                </div>
-                <div class="stat-card" style="--accent-color: #f59e0b">
-                    <div class="label">Unique dates</div>
-                    <div class="value" id="stat-unique">—</div>
-                    <div class="sub">active days</div>
-                </div>
-                <div class="stat-card" style="--accent-color: #06b6d4">
-                    <div class="label">Avg per day</div>
-                    <div class="value" id="stat-avg">—</div>
-                    <div class="sub">points / active day</div>
-                </div>
-            </div>
-
-            <!-- Map panel -->
-            <div class="map-panel">
-                <div class="map-toolbar">
-                    <span class="panel-title">Visualisation</span>
-                    <div class="spacer"></div>
-                    <div class="viz-toggle">
-                        <button class="viz-btn active">Heatmap</button>
-                        <button class="viz-btn">Points</button>
-                        <button class="viz-btn">Clusters</button>
-                    </div>
-                </div>
-                <div class="map-placeholder">
-                    <div class="inner">
-                        <div class="placeholder-icon">🗺</div>
-                        <div class="placeholder-text">Map visualisation</div>
-                        <div class="placeholder-sub">Load a CSV to render data here</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Bottom row -->
-            <div class="bottom-row">
-
-                <!-- Chart -->
-                <div class="chart-panel">
-                    <div class="chart-header">
-                        <span class="panel-title">Points by date</span>
-                        <button class="panel-action">Export ↗</button>
-                    </div>
-                    <div class="chart-body">
-                        <div class="fake-bars" id="fakeBars"></div>
-                        <div class="chart-empty" id="chartEmpty">
-                            <div style="font-size:20px; opacity:0.3; margin-bottom:8px">📊</div>
-                            Load data to see chart
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Table -->
-                <div class="table-panel">
-                    <div class="table-header">
-                        <span class="panel-title">Recent records</span>
-                        <button class="panel-action">View all</button>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Latitude</th>
-                                <th>Longitude</th>
-                                <th>Date</th>
-                                <th>Time</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody">
-                            <tr>
-                                <td colspan="5" class="muted" style="text-align:center; padding:20px">
-                                    No data loaded
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-            </div>
-        </main>
+ 
+<div class="shell">
+ 
+  <!-- Topbar -->
+  <header class="topbar">
+    <span class="wordmark">GeoTrack</span>
+    <div class="divider"></div>
+    <span class="subtitle">Analytics</span>
+    <div class="spacer"></div>
+    <div class="status">
+      <span class="status-dot"></span>
+      No data loaded
     </div>
-
-    <script>
-  // Nav
+  </header>
+ 
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-label">Visualise</div>
+ 
+    <div class="nav-item active" onclick="setActive(this)">
+      <span class="icon">🗺</span>
+      Heatmap
+      <span class="badge">soon</span>
+    </div>
+ 
+    <div class="nav-item" onclick="setActive(this)">
+      <span class="icon">📍</span>
+      Point map
+      <span class="badge">soon</span>
+    </div>
+ 
+    <div class="nav-item" onclick="setActive(this)">
+      <span class="icon">🔵</span>
+      Cluster map
+      <span class="badge">soon</span>
+    </div>
+ 
+    <div class="sidebar-sep"></div>
+    <div class="sidebar-label">Analyse</div>
+ 
+    <div class="nav-item" onclick="setActive(this)">
+      <span class="icon">📅</span>
+      By date
+      <span class="badge">soon</span>
+    </div>
+ 
+    <div class="nav-item" onclick="setActive(this)">
+      <span class="icon">⏱</span>
+      By time of day
+      <span class="badge">soon</span>
+    </div>
+ 
+    <div class="nav-item" onclick="setActive(this)">
+      <span class="icon">📊</span>
+      Frequency
+      <span class="badge">soon</span>
+    </div>
+ 
+    <div class="sidebar-sep"></div>
+    <div class="sidebar-label">Data</div>
+ 
+    <div class="nav-item" onclick="setActive(this)">
+      <span class="icon">📋</span>
+      All records
+    </div>
+ 
+    <div class="nav-item" onclick="setActive(this)">
+      <span class="icon">⬇</span>
+      Export
+      <span class="badge">soon</span>
+    </div>
+ 
+    <div class="back-btn" onclick="window.close()">← Back to app</div>
+  </nav>
+ 
+  <!-- Main -->
+  <main class="main">
+ 
+    <!-- Import bar -->
+    <div class="import-bar">
+      <span class="label">CSV FILE</span>
+      <div class="file-input-wrap">
+        <div class="file-path">locations.csv</div>
+        <button class="btn btn-ghost" onclick="document.getElementById('csvInput').click()">Browse</button>
+        <input id="csvInput" type="file" accept=".csv" style="display:none" onchange="handleFile(this)">
+        <button class="btn btn-primary" onclick="loadData()">Load</button>
+      </div>
+    </div>
+ 
+    <!-- Stat cards -->
+    <div class="stats-row">
+      <div class="stat-card" style="--accent-color: #3b82f6">
+        <div class="label">Total points</div>
+        <div class="value" id="stat-total">—</div>
+        <div class="sub">from CSV</div>
+      </div>
+      <div class="stat-card" style="--accent-color: #22c55e">
+        <div class="label">Date range</div>
+        <div class="value" id="stat-dates" style="font-size:14px; padding-top:8px">—</div>
+        <div class="sub" id="stat-days">—</div>
+      </div>
+      <div class="stat-card" style="--accent-color: #f59e0b">
+        <div class="label">Unique dates</div>
+        <div class="value" id="stat-unique">—</div>
+        <div class="sub">active days</div>
+      </div>
+      <div class="stat-card" style="--accent-color: #06b6d4">
+        <div class="label">Avg per day</div>
+        <div class="value" id="stat-avg">—</div>
+        <div class="sub">points / active day</div>
+      </div>
+    </div>
+ 
+    <!-- Map panel -->
+    <div class="map-panel">
+      <div class="map-toolbar">
+        <span class="panel-title">Visualisation</span>
+        <div class="spacer"></div>
+        <div class="viz-toggle">
+          <button class="viz-btn active">Heatmap</button>
+          <button class="viz-btn">Points</button>
+          <button class="viz-btn">Clusters</button>
+        </div>
+      </div>
+      <div class="map-placeholder">
+        <div id="map"></div>
+        <div class="map-empty-overlay" id="mapEmptyOverlay">
+          <div style="font-size:32px; opacity:0.4">🗺</div>
+          <div style="font-family:var(--mono); font-size:12px; color:var(--muted); letter-spacing:0.05em">Map visualisation</div>
+          <div style="font-size:11px; color:var(--border)">Load a CSV to render data here</div>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- Bottom row -->
+    <div class="bottom-row">
+ 
+      <!-- Chart -->
+      <div class="chart-panel">
+        <div class="chart-header">
+          <span class="panel-title">Points by date</span>
+          <button class="panel-action">Export ↗</button>
+        </div>
+        <div class="chart-body">
+          <div class="fake-bars" id="fakeBars"></div>
+          <div class="chart-empty" id="chartEmpty">
+            <div style="font-size:20px; opacity:0.3; margin-bottom:8px">📊</div>
+            Load data to see chart
+          </div>
+        </div>
+      </div>
+ 
+      <!-- Table -->
+      <div class="table-panel">
+        <div class="table-header">
+          <span class="panel-title">Recent records</span>
+          <button class="panel-action">View all</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Latitude</th>
+              <th>Longitude</th>
+              <th>Date</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr>
+              <td colspan="5" class="muted" style="text-align:center; padding:20px">
+                No data loaded
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+ 
+    </div>
+  </main>
+</div>
+ 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+  // ── Nav ──────────────────────────────────────────────────────────────────
   function setActive(el) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     el.classList.add('active');
   }
-
+ 
   document.querySelectorAll('.viz-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.viz-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
     });
   });
-
-  // CSV
+ 
+  // ── CSV handling ─────────────────────────────────────────────────────────
   let csvFile = null;
-
+  let map = null;
+  let markerLayer = null;
+ 
+  function initMap() {
+    if (map) return;
+    map = L.map('map', { zoomControl: true, attributionControl: false })
+      .setView([-27.4698, 153.0251], 12);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+    }).addTo(map);
+    markerLayer = L.layerGroup().addTo(map);
+  }
+ 
+  function renderMarkers(rows) {
+    initMap();
+    markerLayer.clearLayers();
+ 
+    if (!rows.length) return;
+ 
+    rows.forEach(r => {
+      L.circleMarker([r.lat, r.lon], {
+        radius: 6,
+        color: '#1d4ed8',
+        weight: 1,
+        fillColor: '#3b82f6',
+        fillOpacity: 0.85,
+      })
+      .bindPopup(`<b>${r.lat.toFixed(6)}, ${r.lon.toFixed(6)}</b><br>${r.date} ${r.time}`)
+      .addTo(markerLayer);
+    });
+ 
+    const bounds = L.latLngBounds(rows.map(r => [r.lat, r.lon]));
+    map.fitBounds(bounds, { padding: [30, 30] });
+ 
+    document.getElementById('mapEmptyOverlay').style.display = 'none';
+    setTimeout(() => map.invalidateSize(), 50);
+  }
+ 
   function handleFile(input) {
     if (input.files[0]) {
       csvFile = input.files[0];
       document.querySelector('.file-path').textContent = csvFile.name;
     }
   }
-
+ 
   function loadData() {
     if (!csvFile) {
       // Try loading default locations.csv via fetch (works if served locally)
@@ -818,7 +786,7 @@
     reader.onload = e => parseCSV(e.target.result);
     reader.readAsText(csvFile);
   }
-
+ 
   function parseCSV(text) {
     const lines = text.trim().split('\n');
     const headers = lines[0].split(',').map(h => h.trim());
@@ -832,32 +800,33 @@
         time:  vals[4]?.trim(),
       };
     }).filter(r => !isNaN(r.lat));
-
+ 
     renderStats(rows);
     renderTable(rows);
     renderFakeBars(rows);
+    renderMarkers(rows);
   }
-
+ 
   function renderStats(rows) {
     const dates = rows.map(r => r.date).filter(Boolean);
     const unique = [...new Set(dates)].sort();
-
+ 
     document.getElementById('stat-total').textContent = rows.length;
     document.getElementById('stat-unique').textContent = unique.length;
     document.getElementById('stat-avg').textContent =
       unique.length ? (rows.length / unique.length).toFixed(1) : '—';
-
+ 
     if (unique.length) {
       document.getElementById('stat-dates').textContent =
         unique[0] + (unique.length > 1 ? ' → ' + unique[unique.length - 1] : '');
       document.getElementById('stat-days').textContent =
         unique.length > 1 ? unique.length + ' days span' : 'single day';
     }
-
+ 
     document.querySelector('.status').innerHTML =
       '<span class="status-dot"></span>' + rows.length + ' points loaded';
   }
-
+ 
   function renderTable(rows) {
     const body = document.getElementById('tableBody');
     const recent = rows.slice(-10).reverse();
@@ -871,7 +840,7 @@
       </tr>
     `).join('');
   }
-
+ 
   function renderFakeBars(rows) {
     // Show a silhouette bar chart grouped by date as a visual hint
     const counts = {};
@@ -884,6 +853,6 @@
     ).join('');
     document.getElementById('chartEmpty').textContent = 'Chart coming soon — data ready';
   }
-    </script>
+</script>
 </body>
 </html>
