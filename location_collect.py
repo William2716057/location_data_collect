@@ -89,7 +89,7 @@ def build_main_ui():
  
         save_btn.config(text="Saved!")
         root.after(1500, lambda: save_btn.config(text="Add to CSV"))
- 
+ #retrieve data 
     def show_all_from_csv():
         global csv_markers_visible
  
@@ -101,7 +101,7 @@ def build_main_ui():
             csv_markers_visible = False
             return
  
-        file = "locations.csv"
+        file = "locations.csv" #make selectable
         if not os.path.exists(file):
             return
  
