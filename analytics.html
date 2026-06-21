@@ -276,12 +276,14 @@
                 margin-top: 6px;
             }
 
-        .map-panel {
+        .map-panel { 
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 8px;
             overflow: hidden;
             position: relative;
+            display: flex; 
+            flex-direction: column;
         }
 
         .map-toolbar {
@@ -291,6 +293,7 @@
             padding: 10px 14px;
             border-bottom: 1px solid var(--border);
             background: var(--surface2);
+            flex-shrink: 0; 
         }
 
             .map-toolbar .panel-title {
