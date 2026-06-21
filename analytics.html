@@ -14,471 +14,689 @@
             padding: 0;
         }
 
-  :root {
-    --bg:         #0a0f1a;
-    --surface:    #111827;
-    --surface2:   #1a2235;
-    --border:     #1e2d45;
-    --accent:     #3b82f6;
-    --accent2:    #06b6d4;
-    --green:      #22c55e;
-    --amber:      #f59e0b;
-    --text:       #e2e8f0;
-    --muted:      #64748b;
-    --mono:       'JetBrains Mono', monospace;
-    --sans:       'Inter', sans-serif;
-  }
- 
-  html, body {
-    height: 100%;
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    font-size: 14px;
-    line-height: 1.5;
-  }
- 
-  .shell {
-    display: grid;
-    grid-template-rows: 52px 1fr;
-    grid-template-columns: 220px 1fr;
-    height: 100vh;
-    overflow: hidden;
-  }
- 
-  .topbar {
-    grid-column: 1 / -1;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    padding: 0 20px;
-    gap: 12px;
-  }
- 
-  .topbar .wordmark {
-    font-family: var(--mono);
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--accent);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
- 
-  .topbar .divider { width: 1px; height: 20px; background: var(--border); }
- 
-  .topbar .subtitle {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.05em;
-  }
- 
-  .topbar .spacer { flex: 1; }
- 
-  .topbar .status {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-  }
- 
-  .status-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 6px var(--green);
-  }
- 
-  .sidebar {
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    padding: 20px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    overflow-y: auto;
-  }
- 
-  .sidebar-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 12px 20px 6px;
-  }
- 
-  .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 9px 20px;
-    font-size: 13px;
-    color: var(--muted);
-    cursor: pointer;
-    border-left: 2px solid transparent;
-    transition: all 0.15s;
-    user-select: none;
-  }
- 
-  .nav-item:hover { color: var(--text); background: var(--surface2); }
- 
-  .nav-item.active {
-    color: var(--accent);
-    border-left-color: var(--accent);
-    background: rgba(59,130,246,0.07);
-  }
- 
-  .nav-item .icon { font-size: 15px; width: 18px; text-align: center; }
- 
-  .nav-item .badge {
-    margin-left: auto;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-family: var(--mono);
-    font-size: 10px;
-    padding: 1px 6px;
-    border-radius: 3px;
-  }
- 
-  .nav-item.active .badge {
-    background: rgba(59,130,246,0.15);
-    border-color: rgba(59,130,246,0.3);
-    color: var(--accent);
-  }
- 
-  .sidebar-sep { height: 1px; background: var(--border); margin: 10px 0; }
- 
-  .back-btn {
-    margin: auto 16px 0;
-    padding: 9px 14px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--muted);
-    font-family: var(--mono);
-    font-size: 11px;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.15s;
-  }
- 
-  .back-btn:hover { color: var(--text); border-color: var(--accent); }
- 
-  .main {
-    overflow-y: auto;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
- 
-  .panel-header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    margin-bottom: 4px;
-  }
- 
-  .panel-title {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
- 
-  .panel-action {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--accent);
-    cursor: pointer;
-    background: none;
-    border: none;
-    padding: 0;
-  }
- 
-  .panel-action:hover { text-decoration: underline; }
- 
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-  }
- 
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 16px 18px;
-    position: relative;
-    overflow: hidden;
-  }
- 
-  .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--accent-color, var(--accent));
-  }
- 
-  .stat-card .label {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
- 
-  .stat-card .value {
-    font-family: var(--mono);
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--text);
-    line-height: 1;
-  }
- 
-  .stat-card .sub { font-size: 11px; color: var(--muted); margin-top: 6px; }
- 
-  .map-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-  }
- 
-  .map-toolbar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface2);
-    flex-shrink: 0;
-  }
- 
-  .map-toolbar .panel-title { margin: 0; }
-  .map-toolbar .spacer { flex: 1; }
- 
-  .viz-toggle { display: flex; gap: 4px; }
- 
-  .viz-btn {
-    padding: 5px 12px;
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.05em;
-    border-radius: 4px;
-    border: 1px solid var(--border);
-    background: none;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
- 
-  .viz-btn:hover { color: var(--text); border-color: var(--muted); }
-  .viz-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
- 
-  .map-placeholder { flex: 1 0 auto; height: 380px; min-height: 200px; max-height: 80vh; position: relative; }
- 
-  .resize-handle {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 10px;
-    cursor: ns-resize;
-    z-index: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
- 
-  .resize-handle::after {
-    content: '';
-    width: 36px;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--border);
-    transition: background 0.15s;
-  }
- 
-  .resize-handle:hover::after,
-  .resize-handle.dragging::after {
-    background: var(--accent);
-  }
- 
-  #map { height: 100%; width: 100%; filter: brightness(0.85) contrast(1.05); }
- 
-  .map-empty-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    background: var(--surface);
-    z-index: 500;
-    pointer-events: none;
-  }
- 
-  .bottom-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
- 
-  .chart-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-  }
- 
-  .chart-header {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
- 
-  .chart-body {
-    height: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--muted);
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.05em;
-    flex-direction: column;
-    gap: 8px;
-    position: relative;
-    overflow: hidden;
-  }
- 
-  .fake-bars {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 100%;
-    display: flex;
-    align-items: flex-end;
-    gap: 6px;
-    padding: 0 20px 20px;
-    opacity: 0.08;
-  }
- 
-  .fake-bar { flex: 1; background: var(--accent); border-radius: 3px 3px 0 0; min-height: 8px; }
- 
-  .chart-empty { position: relative; z-index: 1; text-align: center; }
- 
-  .table-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-  }
- 
-  .table-header {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
- 
-  table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 11px; }
- 
-  thead th {
-    padding: 8px 16px;
-    text-align: left;
-    color: var(--muted);
-    font-weight: 600;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface2);
-    font-size: 10px;
-  }
- 
-  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: var(--surface2); }
-  tbody td { padding: 9px 16px; color: var(--text); }
-  tbody td.muted { color: var(--muted); }
- 
-  .dot {
-    display: inline-block;
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    margin-right: 6px;
-    vertical-align: middle;
-  }
- 
-  .import-bar {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 18px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
- 
-  .import-bar .label {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-  }
- 
-  .file-input-wrap { flex: 1; display: flex; align-items: center; gap: 10px; }
- 
-  .file-path {
-    flex: 1;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 7px 12px;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-  }
- 
-  .btn {
-    padding: 8px 16px;
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
- 
-  .btn-primary { background: var(--accent); color: white; }
-  .btn-primary:hover { background: #2563eb; }
- 
-  .btn-ghost { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
-  .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
- 
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        :root {
+            --bg: #0a0f1a;
+            --surface: #111827;
+            --surface2: #1a2235;
+            --border: #1e2d45;
+            --accent: #3b82f6;
+            --accent2: #06b6d4;
+            --green: #22c55e;
+            --amber: #f59e0b;
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'Inter', sans-serif;
+        }
+
+        html, body {
+            height: 100%;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .shell {
+            display: grid;
+            grid-template-rows: 52px 1fr;
+            grid-template-columns: 220px 1fr;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .topbar {
+            grid-column: 1 / -1;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 12px;
+        }
+
+            .topbar .wordmark {
+                font-family: var(--mono);
+                font-size: 13px;
+                font-weight: 700;
+                color: var(--accent);
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+            }
+
+            .topbar .divider {
+                width: 1px;
+                height: 20px;
+                background: var(--border);
+            }
+
+            .topbar .subtitle {
+                font-family: var(--mono);
+                font-size: 11px;
+                color: var(--muted);
+                letter-spacing: 0.05em;
+            }
+
+            .topbar .spacer {
+                flex: 1;
+            }
+
+            .topbar .status {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-family: var(--mono);
+                font-size: 11px;
+                color: var(--muted);
+            }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 6px var(--green);
+        }
+
+        .sidebar {
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow-y: auto;
+        }
+
+        .sidebar-label {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--muted);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 12px 20px 6px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 20px;
+            font-size: 13px;
+            color: var(--muted);
+            cursor: pointer;
+            border-left: 2px solid transparent;
+            transition: all 0.15s;
+            user-select: none;
+        }
+
+            .nav-item:hover {
+                color: var(--text);
+                background: var(--surface2);
+            }
+
+            .nav-item.active {
+                color: var(--accent);
+                border-left-color: var(--accent);
+                background: rgba(59,130,246,0.07);
+            }
+
+            .nav-item .icon {
+                font-size: 15px;
+                width: 18px;
+                text-align: center;
+            }
+
+            .nav-item .badge {
+                margin-left: auto;
+                background: var(--surface2);
+                border: 1px solid var(--border);
+                color: var(--muted);
+                font-family: var(--mono);
+                font-size: 10px;
+                padding: 1px 6px;
+                border-radius: 3px;
+            }
+
+            .nav-item.active .badge {
+                background: rgba(59,130,246,0.15);
+                border-color: rgba(59,130,246,0.3);
+                color: var(--accent);
+            }
+
+        .sidebar-sep {
+            height: 1px;
+            background: var(--border);
+            margin: 10px 0;
+        }
+
+        .back-btn {
+            margin: auto 16px 0;
+            padding: 9px 14px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--muted);
+            font-family: var(--mono);
+            font-size: 11px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s;
+        }
+
+            .back-btn:hover {
+                color: var(--text);
+                border-color: var(--accent);
+            }
+
+        .main {
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .panel-title {
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--muted);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .panel-action {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--accent);
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+            .panel-action:hover {
+                text-decoration: underline;
+            }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 18px;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .stat-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: var(--accent-color, var(--accent));
+            }
+
+            .stat-card .label {
+                font-family: var(--mono);
+                font-size: 10px;
+                color: var(--muted);
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                margin-bottom: 8px;
+            }
+
+            .stat-card .value {
+                font-family: var(--mono);
+                font-size: 28px;
+                font-weight: 700;
+                color: var(--text);
+                line-height: 1;
+            }
+
+            .stat-card .sub {
+                font-size: 11px;
+                color: var(--muted);
+                margin-top: 6px;
+            }
+
+        .date-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .date-nav-btn {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            color: var(--text);
+            font-size: 13px;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+            .date-nav-btn:hover {
+                background: var(--accent);
+                border-color: var(--accent);
+            }
+
+            .date-nav-btn:disabled {
+                opacity: 0.3;
+                cursor: not-allowed;
+            }
+
+                .date-nav-btn:disabled:hover {
+                    background: var(--surface2);
+                    border-color: var(--border);
+                }
+
+        .date-nav-current {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text);
+            flex: 1;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .date-nav-clear {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: none;
+            background: var(--surface2);
+            color: var(--muted);
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+            .date-nav-clear:hover {
+                background: #7f1d1d;
+                color: #fca5a5;
+            }
+
+        .map-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .map-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface2);
+            flex-shrink: 0;
+        }
+
+            .map-toolbar .panel-title {
+                margin: 0;
+            }
+
+            .map-toolbar .spacer {
+                flex: 1;
+            }
+
+        .viz-toggle {
+            display: flex;
+            gap: 4px;
+        }
+
+        .viz-btn {
+            padding: 5px 12px;
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: 0.05em;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background: none;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+            .viz-btn:hover {
+                color: var(--text);
+                border-color: var(--muted);
+            }
+
+            .viz-btn.active {
+                background: var(--accent);
+                border-color: var(--accent);
+                color: white;
+            }
+
+        .map-placeholder {
+            flex: 1 0 auto;
+            height: 380px;
+            min-height: 200px;
+            max-height: 80vh;
+            position: relative;
+        }
+
+        .resize-handle {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 10px;
+            cursor: ns-resize;
+            z-index: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .resize-handle::after {
+                content: '';
+                width: 36px;
+                height: 4px;
+                border-radius: 2px;
+                background: var(--border);
+                transition: background 0.15s;
+            }
+
+            .resize-handle:hover::after,
+            .resize-handle.dragging::after {
+                background: var(--accent);
+            }
+
+        #map {
+            height: 100%;
+            width: 100%;
+            filter: brightness(0.85) contrast(1.05);
+        }
+
+        .map-empty-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            background: var(--surface);
+            z-index: 500;
+            pointer-events: none;
+        }
+
+        .bottom-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .chart-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .chart-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chart-body {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fake-bars {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            padding: 0 20px 20px;
+            opacity: 0.08;
+        }
+
+        .fake-bar {
+            flex: 1;
+            background: var(--accent);
+            border-radius: 3px 3px 0 0;
+            min-height: 8px;
+        }
+
+        .chart-empty {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .table-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--mono);
+            font-size: 11px;
+        }
+
+        thead th {
+            padding: 8px 16px;
+            text-align: left;
+            color: var(--muted);
+            font-weight: 600;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface2);
+            font-size: 10px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.1s;
+        }
+
+            tbody tr:last-child {
+                border-bottom: none;
+            }
+
+            tbody tr:hover {
+                background: var(--surface2);
+            }
+
+        tbody td {
+            padding: 9px 16px;
+            color: var(--text);
+        }
+
+            tbody td.muted {
+                color: var(--muted);
+            }
+
+        .dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+
+        .import-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+            .import-bar .label {
+                font-family: var(--mono);
+                font-size: 11px;
+                color: var(--muted);
+                letter-spacing: 0.05em;
+                white-space: nowrap;
+            }
+
+        .file-input-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-path {
+            flex: 1;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: 7px 12px;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .btn {
+            padding: 8px 16px;
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+            .btn-primary:hover {
+                background: #2563eb;
+            }
+
+        .btn-ghost {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--muted);
+        }
+
+            .btn-ghost:hover {
+                color: var(--text);
+                border-color: var(--muted);
+            }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+            .btn-primary:hover {
+                background: #2563eb;
+            }
+
+        .btn-ghost {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--muted);
+        }
+
+            .btn-ghost:hover {
+                color: var(--text);
+                border-color: var(--muted);
+            }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
     </style>
 </head>
 <body>
@@ -497,7 +715,6 @@
         </header>
 
         <nav class="sidebar">
-            <!--left panel-->
             <div class="sidebar-label">Visualise</div>
 
             <div class="nav-item" data-viz="heatmap" onclick="setViz('heatmap', this)">
@@ -579,7 +796,13 @@
                 <div class="stat-card" style="--accent-color: #f59e0b">
                     <div class="label">Unique dates</div>
                     <div class="value" id="stat-unique">—</div>
-                    <div class="sub">active days</div>
+                    <div class="sub" id="dateNavSub">active days</div>
+                    <div class="date-nav" id="dateNav" style="display:none">
+                        <button class="date-nav-btn" id="datePrevBtn" onclick="stepDate(-1)">‹</button>
+                        <span class="date-nav-current" id="dateNavCurrent">—</span>
+                        <button class="date-nav-btn" id="dateNextBtn" onclick="stepDate(1)">›</button>
+                        <button class="date-nav-clear" id="dateClearBtn" onclick="clearDateFilter()">✕</button>
+                    </div>
                 </div>
                 <div class="stat-card" style="--accent-color: #06b6d4">
                     <div class="label">Avg per day</div>
@@ -588,7 +811,7 @@
                 </div>
             </div>
 
-            <div class="map-panel"> <!--here-->
+            <div class="map-panel">
                 <div class="map-toolbar">
                     <span class="panel-title">Visualisation</span>
                     <div class="spacer"></div>
@@ -598,13 +821,14 @@
                         <button class="viz-btn">Clusters</button>
                     </div>
                 </div>
-                <div class="map-placeholder">
+                <div class="map-placeholder" id="mapPlaceholder">
                     <div id="map"></div>
                     <div class="map-empty-overlay" id="mapEmptyOverlay">
                         <div style="font-size:32px; opacity:0.4">🗺</div>
                         <div style="font-family:var(--mono); font-size:12px; color:var(--muted); letter-spacing:0.05em">Map visualisation</div>
                         <div style="font-size:11px; color:var(--border)">Load a CSV to render data here</div>
                     </div>
+                    <div class="resize-handle" id="resizeHandle"></div>
                 </div>
             </div>
 
@@ -656,7 +880,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
     <script>
-        // Nav 
+        // Nav
         function setActive(el) {
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
@@ -687,7 +911,7 @@
                 setViz(order[idx]);
             });
         });
-
+        /*
         document.querySelectorAll('.viz-btn').forEach((btn, idx) => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.viz-btn').forEach(b => b.classList.remove('active'));
@@ -695,14 +919,20 @@
                 currentViz = ['heatmap', 'points', 'clusters'][idx];
                 if (lastRows) renderMarkers(lastRows);
             });
-        });
+        });*/
 
-        // CSV handling 
+        // CSV handling
         let csvFile = null;
         let map = null;
         let markerLayer = null;
         let heatLayer = null;
         let lastRows = null;
+        let allRows = null;
+
+        //date slide
+
+        let uniqueDates = [];
+        let dateIndex = -1;   // -1 means "no filter, show all"
 
         function initMap() {
             if (map) return;
@@ -713,6 +943,16 @@
             }).addTo(map);
             markerLayer = L.layerGroup().addTo(map);
         }
+        /*
+        function initMap() {
+            if (map) return;
+            map = L.map('map', { zoomControl: true, attributionControl: false })
+                .setView([-27.4698, 153.0251], 12);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                maxZoom: 19,
+            }).addTo(map);
+            markerLayer = L.layerGroup().addTo(map);
+        }*/
 
         function clearLayers() {
             if (markerLayer) markerLayer.clearLayers();
@@ -825,6 +1065,9 @@
                 };
             }).filter(r => !isNaN(r.lat));
 
+            allRows = rows;
+            dateIndex = -1;
+
             renderStats(rows);
             renderTable(rows);
             renderFakeBars(rows);
@@ -834,6 +1077,7 @@
         function renderStats(rows) {
             const dates = rows.map(r => r.date).filter(Boolean);
             const unique = [...new Set(dates)].sort();
+            uniqueDates = unique;   
 
             document.getElementById('stat-total').textContent = rows.length;
             document.getElementById('stat-unique').textContent = unique.length;
@@ -847,22 +1091,72 @@
                     unique.length > 1 ? unique.length + ' days span' : 'single day';
             }
 
+            document.getElementById('dateNav').style.display = unique.length ? 'flex' : 'none';
+            document.getElementById('dateNavSub').style.display = unique.length ? 'none' : 'block';
+            updateDateNavUI();
+
             document.querySelector('.status').innerHTML =
                 '<span class="status-dot"></span>' + rows.length + ' points loaded';
+        }
+
+        function updateDateNavUI() {
+            const label = document.getElementById('dateNavCurrent');
+            const prevBtn = document.getElementById('datePrevBtn');
+            const nextBtn = document.getElementById('dateNextBtn');
+            const clearBtn = document.getElementById('dateClearBtn');
+
+            if (dateIndex === -1) {
+                label.textContent = 'All dates';
+                clearBtn.style.visibility = 'hidden';
+            } else {
+                label.textContent = uniqueDates[dateIndex];
+                clearBtn.style.visibility = 'visible';
+            }
+
+            prevBtn.disabled = dateIndex === 0;
+            nextBtn.disabled = dateIndex === uniqueDates.length - 1;
+        }
+
+        function stepDate(direction) {
+            if (!uniqueDates.length || !allRows) return;
+
+            if (dateIndex === -1) {
+                // Coming from "all" — start at the first or last date depending on direction
+                dateIndex = direction > 0 ? 0 : uniqueDates.length - 1;
+            } else {
+                const next = dateIndex + direction;
+                if (next < 0 || next >= uniqueDates.length) return;
+                dateIndex = next;
+            }
+
+            applyDateFilter();
+        }
+
+        function applyDateFilter() {
+            updateDateNavUI();
+            const targetDate = uniqueDates[dateIndex];
+            const filtered = allRows.filter(r => r.date === targetDate);
+            renderMarkers(filtered);
+        }
+
+        function clearDateFilter() {
+            dateIndex = -1;
+            updateDateNavUI();
+            if (allRows) renderMarkers(allRows);
         }
 
         function renderTable(rows) {
             const body = document.getElementById('tableBody');
             const recent = rows.slice(-10).reverse();
             body.innerHTML = recent.map(r => `
-          <tr>
-            <td class="muted">${r.count}</td>
-            <td>${r.lat.toFixed(6)}</td>
-            <td>${r.lon.toFixed(6)}</td>
-            <td class="muted">${r.date}</td>
-            <td class="muted">${r.time}</td>
-          </tr>
-        `).join('');
+                  <tr>
+                    <td class="muted">${r.count}</td>
+                    <td>${r.lat.toFixed(6)}</td>
+                    <td>${r.lon.toFixed(6)}</td>
+                    <td class="muted">${r.date}</td>
+                    <td class="muted">${r.time}</td>
+                  </tr>
+                `).join('');
         }
 
         function renderFakeBars(rows) {
