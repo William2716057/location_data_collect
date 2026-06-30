@@ -170,7 +170,7 @@
             background: var(--border);
             margin: 10px 0;
         }
-
+        /*date styling*/
         .date-calendar {
             display: none;
             padding: 10px 16px 14px;
@@ -304,7 +304,73 @@
                 text-decoration: underline;
             }
 
-        .back-btn {
+            /*time sliders*/
+        .time-slider-panel {
+            display: none;
+            padding: 14px 16px 14px;
+            background: var(--surface2);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+            .time-slider-panel.open {
+                display: block;
+            }
+
+        .time-slider-label {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent);
+            display: block;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .time-slider-input {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: var(--border);
+            outline: none;
+            cursor: pointer;
+            margin: 4px 0;
+        }
+
+            .time-slider-input::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 14px;
+                height: 14px;
+                border-radius: 50%;
+                background: var(--accent);
+                border: 2px solid var(--surface2);
+                box-shadow: 0 0 0 1px var(--accent);
+                cursor: pointer;
+            }
+
+            .time-slider-input::-moz-range-thumb { /*not valid psuedo element*/
+                width: 14px;
+                height: 14px;
+                border-radius: 50%;
+                background: var(--accent);
+                border: 2px solid var(--surface2);
+                box-shadow: 0 0 0 1px var(--accent);
+                cursor: pointer;
+            }
+
+        .time-slider-ticks {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .back-btn { /*unnecessary*/
             margin: auto 16px 0;
             padding: 9px 14px;
             background: var(--surface2);
@@ -637,8 +703,8 @@
             padding: 0 20px 20px;
             opacity: 0.08;
         }
-        /*here*/
-        .bar-display { /*change name*/
+        
+        .bar-display { 
             position: absolute;
             bottom: 0;
             left: 0;
@@ -707,7 +773,7 @@
             z-index: 1;
             text-align: center;
         }
-        /*to here*/
+        
         .table-panel {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -903,8 +969,9 @@
                 No data loaded
             </div>
         </header>
-
+        <!--side panels-->
         <nav class="sidebar">
+            <!--map visualisations-->
             <div class="sidebar-label">Visualise</div>
 
             <div class="nav-item" data-viz="heatmap" onclick="setViz('heatmap', this)">
@@ -921,21 +988,16 @@
                 <span class="icon">🔵</span>
                 Cluster map
             </div>
-
+            <!--filters-->
             <div class="sidebar-sep"></div>
             <div class="sidebar-label">Analyse</div>
 
-            <!--<div class="nav-item" onclick="setActive(this)">
-        <span class="icon">📅</span>
-        By date
-        <span class="badge">soon</span>
-    </div>-->
 
             <div class="nav-item" id="byDateNavItem" onclick="toggleDateCalendar(this)">
                 <span class="icon">📅</span>
                 By date
             </div>
-
+            <!--date slider-->
             <div class="date-calendar" id="dateCalendar">
                 <div class="cal-header">
                     <button class="cal-nav-btn" onclick="calStepMonth(-1)">‹</button>
@@ -948,18 +1010,29 @@
                     <button class="cal-clear-btn" onclick="calClearSelection()">Clear</button>
                 </div>
             </div>
-
-            <!-- <div class="nav-item" id="byDateNavItem" onclick="toggleDateCalendar(this)">
-         <span class="icon">📅</span>
-         By date
-     </div>-->
-
-            <div class="nav-item" onclick="setActive(this)">
+            <!--Time slider-->
+            <div class="nav-item" id="byTimeNavItem" onclick="toggleTimeSlider(this)">
                 <span class="icon">⏱</span>
                 By time of day
-                <span class="badge">soon</span>
             </div>
 
+            <div class="time-slider-panel" id="timeSliderPanel">
+                <span class="time-slider-label" id="timeSliderLabel">All times</span>
+                <input type="range" class="time-slider-input" id="timeSliderInput"
+                       min="0" max="24" step="1" value="0"
+                       oninput="onTimeSliderInput(this.value)">
+                <div class="time-slider-ticks">
+                    <span>00:00</span>
+                    <span>12:00</span>
+                    <span>23:59</span>
+                </div>
+                <div class="cal-footer">
+                    <span class="cal-selected-label" id="timeSelectedLabel">No filter</span>
+                    <button class="cal-clear-btn" onclick="clearTimeSlider()">Clear</button>
+                </div>
+            </div>
+
+            <!--may be unnecessary-->
             <div class="nav-item" onclick="setActive(this)">
                 <span class="icon">📊</span>
                 Frequency
@@ -1360,7 +1433,7 @@
         function renderChart(rows) {
             const counts = {};
             rows.forEach(r => { counts[r.date] = (counts[r.date] || 0) + 1; });
-            //const vals = Object.values(counts);
+           
             const dates = Object.keys(counts).sort();
             const max = Math.max(...Object.values(counts));
 
@@ -1394,6 +1467,7 @@
         }
 
         //calendar 
+        //calendar and time filters need to synchronise
         let calOpen = false;
         let calViewYear = new Date().getFullYear();
         let calViewMonth = new Date().getMonth(); // 0-indexed
@@ -1469,6 +1543,58 @@
         function calClearSelection() {
             calSelectedDate = null;
             renderCalendar();
+            if (allRows) renderMarkers(allRows);
+        }
+
+        let timeOpen = false;
+        let timeSliderHour = 0; // 0 = off / all times. 1-24 = filter to (hour-1):00 - hour:00
+
+        function toggleTimeSlider(el) {
+            timeOpen = !timeOpen;
+            document.getElementById('timeSliderPanel').classList.toggle('open', timeOpen);
+            el.classList.toggle('active', timeOpen);
+        }
+
+        function onTimeSliderInput(val) {
+            timeSliderHour = parseInt(val, 10);
+            updateTimeSliderUI();
+            applyTimeFilter();
+        }
+
+        function updateTimeSliderUI() {
+            const label = document.getElementById('timeSliderLabel');
+            const selLabel = document.getElementById('timeSelectedLabel');
+
+            if (timeSliderHour === 0) {
+                label.textContent = 'All times';
+                selLabel.textContent = 'No filter';
+            } else {
+                const rangeLabel = `${pad2(timeSliderHour - 1)}:00 – ${pad2(timeSliderHour)}:00`;
+                label.textContent = rangeLabel;
+                selLabel.textContent = rangeLabel;
+            }
+        }
+
+        function applyTimeFilter() {
+            if (!allRows) return;
+
+            if (timeSliderHour === 0) {
+                renderMarkers(allRows);
+                return;
+            }
+
+            const targetHour = timeSliderHour - 1;
+            const filtered = allRows.filter(r => {
+                const h = parseInt((r.time || '').split(':')[0], 10);
+                return h === targetHour;
+            });
+            renderMarkers(filtered);
+        }
+
+        function clearTimeSlider() {
+            timeSliderHour = 0;
+            document.getElementById('timeSliderInput').value = 0;
+            updateTimeSliderUI();
             if (allRows) renderMarkers(allRows);
         }
     </script>
