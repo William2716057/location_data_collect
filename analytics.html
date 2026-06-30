@@ -925,10 +925,15 @@
             <div class="sidebar-sep"></div>
             <div class="sidebar-label">Analyse</div>
 
-            <div class="nav-item" onclick="setActive(this)">
+            <!--<div class="nav-item" onclick="setActive(this)">
+        <span class="icon">📅</span>
+        By date
+        <span class="badge">soon</span>
+    </div>-->
+
+            <div class="nav-item" id="byDateNavItem" onclick="toggleDateCalendar(this)">
                 <span class="icon">📅</span>
                 By date
-                <!--<span class="badge">soon</span>-->
             </div>
 
             <div class="date-calendar" id="dateCalendar">
@@ -944,10 +949,10 @@
                 </div>
             </div>
 
-            <div class="nav-item" id="byDateNavItem" onclick="toggleDateCalendar(this)">
-                <span class="icon">📅</span>
-                By date
-            </div>
+            <!-- <div class="nav-item" id="byDateNavItem" onclick="toggleDateCalendar(this)">
+         <span class="icon">📅</span>
+         By date
+     </div>-->
 
             <div class="nav-item" onclick="setActive(this)">
                 <span class="icon">⏱</span>
