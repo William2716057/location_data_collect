@@ -440,7 +440,7 @@
         #map {
             height: 100%;
             width: 100%;
-            filter: brightness(0.85) contrast(1.05);
+            filter: brightness(2) contrast(1.05); /*0.85, 1.05*/
         }
 
         .map-empty-overlay {
@@ -505,11 +505,68 @@
             opacity: 0.08;
         }
         /*here*/
-        .fake-bar { 
+        .fake-bars { /*change name*/
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            padding: 0 20px 20px;
+            opacity: 0.08;
+        }
+
+            .fake-bars.is-live {
+                opacity: 1;
+                align-items: stretch;
+                padding-bottom: 8px;
+            }
+
+        .chart-bar-wrap {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .chart-bar {
+            flex: 1;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .chart-bar-fill {
+            width: 100%;
             background: var(--accent);
             border-radius: 3px 3px 0 0;
-            min-height: 8px;
+            min-height: 4px;
+            transition: background 0.15s;
+        }
+
+        .chart-bar-wrap:hover .chart-bar-fill {
+            background: var(--accent2);
+        }
+
+        .chart-bar-wrap.active .chart-bar-fill {
+            background: var(--amber);
+        }
+
+        .chart-bar-label {
+            font-size: 9px;
+            color: var(--muted);
+            text-align: center;
+            padding-top: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chart-bar-wrap.active .chart-bar-label {
+            color: var(--amber);
         }
 
         .chart-empty {
@@ -517,7 +574,7 @@
             z-index: 1;
             text-align: center;
         }
-
+        /*to here*/
         .table-panel {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -1049,10 +1106,11 @@
 
             allRows = rows;
             dateIndex = -1;
+            activeChartDate = null;
 
             renderStats(rows);
             renderTable(rows);
-            renderFakeBars(rows);
+            renderChart(rows);
             renderMarkers(rows);
         }
 
@@ -1141,16 +1199,42 @@
                 `).join('');
         }
 
-        function renderFakeBars(rows) {
+        let activeChartDate = null;
+
+        function renderChart(rows) {
             const counts = {};
             rows.forEach(r => { counts[r.date] = (counts[r.date] || 0) + 1; });
-            const vals = Object.values(counts);
-            const max = Math.max(...vals);
+            //const vals = Object.values(counts);
+            const dates = Object.keys(counts).sort();
+            const max = Math.max(...Object.values(counts));
+
             const container = document.getElementById('fakeBars');
-            container.innerHTML = vals.map(v =>
-                `<div class="fake-bar" style="height:${(v / max * 100)}%"></div>`
-            ).join('');
-            document.getElementById('chartEmpty').textContent = 'Chart coming soon — data ready';
+            container.classList.add('is-live');
+            container.innerHTML = dates.map(d => `
+                <div class="chart-bar-wrap${d === activeChartDate ? ' active' : ''}" onclick="onChartBarClick('${d}')" title="${d}: ${counts[d]} point${counts[d] > 1 ? 's' : ''}">
+                    <div class="chart-bar">
+                        <div class="chart-bar-fill" style="height:${(counts[d] / max * 100)}%"></div>
+                    </div>
+                    <div class="chart-bar-label">${d.slice(5)}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('chartEmpty').style.display = 'none';
+        }
+
+        function onChartBarClick(d) {
+            if (!allRows) return;
+
+            if (activeChartDate === d) {
+                activeChartDate = null;
+                renderChart(allRows);
+                renderMarkers(allRows);
+                return;
+            }
+
+            activeChartDate = d;
+            renderChart(allRows);
+            renderMarkers(allRows.filter(r => r.date === d));
         }
     </script>
 </body>
