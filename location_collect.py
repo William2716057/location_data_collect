@@ -70,7 +70,7 @@ def build_main_ui():
         history_list.insert(0, f"{len(clicked_coords):>3}.  {lat:.6f},  {lon:.6f} {today} {now}")
  
     def save_to_csv():
-        file = "locations.csv"
+        file = "locations.csv" #bug here
         start_count = 1
  
         if os.path.exists(file):
@@ -101,7 +101,7 @@ def build_main_ui():
             csv_markers_visible = False
             return
  
-        file = "locations.csv" #make selectable
+        file = "locations.csv" #bug here
         if not os.path.exists(file):
             return
  

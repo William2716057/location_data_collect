@@ -775,7 +775,7 @@
             <div class="import-bar">
                 <span class="label">CSV FILE</span>
                 <div class="file-input-wrap">
-                    <div class="file-path">locations.csv</div>
+                    <div class="file-path">filename.csv</div>
                     <button class="btn btn-ghost" onclick="document.getElementById('csvInput').click()">Browse</button>
                     <input id="csvInput" type="file" accept=".csv" style="display:none" onchange="handleFile(this)">
                     <button class="btn btn-primary" onclick="loadData()">Load</button>
@@ -911,15 +911,6 @@
                 setViz(order[idx]);
             });
         });
-        /*
-        document.querySelectorAll('.viz-btn').forEach((btn, idx) => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.viz-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentViz = ['heatmap', 'points', 'clusters'][idx];
-                if (lastRows) renderMarkers(lastRows);
-            });
-        });*/
 
         // CSV handling
         let csvFile = null;
@@ -943,16 +934,7 @@
             }).addTo(map);
             markerLayer = L.layerGroup().addTo(map);
         }
-        /*
-        function initMap() {
-            if (map) return;
-            map = L.map('map', { zoomControl: true, attributionControl: false })
-                .setView([-27.4698, 153.0251], 12);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                maxZoom: 19,
-            }).addTo(map);
-            markerLayer = L.layerGroup().addTo(map);
-        }*/
+
 
         function clearLayers() {
             if (markerLayer) markerLayer.clearLayers();
@@ -1121,7 +1103,7 @@
             if (!uniqueDates.length || !allRows) return;
 
             if (dateIndex === -1) {
-                // Coming from "all" — start at the first or last date depending on direction
+
                 dateIndex = direction > 0 ? 0 : uniqueDates.length - 1;
             } else {
                 const next = dateIndex + direction;
