@@ -1015,7 +1015,7 @@
                 <span class="icon">⏱</span>
                 By time of day
             </div>
-
+             
             <div class="time-slider-panel" id="timeSliderPanel">
                 <span class="time-slider-label" id="timeSliderLabel">All times</span>
                 <input type="range" class="time-slider-input" id="timeSliderInput"
@@ -1134,6 +1134,7 @@
                     </div>
                 </div>
 
+                <!--CSV content bar-->
                 <div class="table-panel">
                     <div class="table-header">
                         <span class="panel-title">Recent records</span>
@@ -1528,16 +1529,9 @@
         function calSelectDate(dateStr) {
             if (!allRows) return;
 
-            if (calSelectedDate === dateStr) {
-                calSelectedDate = null;
-                renderCalendar();
-                renderMarkers(allRows);
-                return;
-            }
-
-            calSelectedDate = dateStr;
+            calSelectedDate = (calSelectedDate === dateStr) ? null : dateStr;
             renderCalendar();
-            renderMarkers(allRows.filter(r => r.date === dateStr));
+            applyCombinedFilter();
         }
 
         function calClearSelection() {
@@ -1597,6 +1591,31 @@
             updateTimeSliderUI();
             if (allRows) renderMarkers(allRows);
         }
+
+        function applyCombinedFilter() {
+            if (!allRows) return;
+
+            let rows = allRows;
+
+            if (calSelectedDate) {
+                rows = rows.filter(r => r.date === calSelectedDate);
+            }
+
+            if (timeSliderHour !== 0) {
+                const targetHour = timeSliderHour - 1;
+                rows = rows.filter(r => parseInt((r.time || '').split(':')[0], 10) === targetHour);
+            }
+
+            renderMarkers(rows);
+        }
+
+        function clearTimeSlider() {
+            timeSliderHour = 0;
+            document.getElementById('timeSliderInput').value = 0;
+            updateTimeSliderUI();
+            applyCombinedFilter();
+        }
+
     </script>
 </body>
 </html>
