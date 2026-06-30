@@ -1033,27 +1033,27 @@
             </div>
 
             <!--may be unnecessary-->
-            <div class="nav-item" onclick="setActive(this)">
+           <!--- <div class="nav-item" onclick="setActive(this)">
                 <span class="icon">📊</span>
                 Frequency
                 <span class="badge">soon</span>
-            </div>
+            </div>-->
 
             <div class="sidebar-sep"></div>
-            <div class="sidebar-label">Data</div>
+           <!-- <div class="sidebar-label">Data</div>
 
             <div class="nav-item" onclick="setActive(this)">
                 <span class="icon">📋</span>
                 All records
-            </div>
+            </div>-->
 
-            <div class="nav-item" onclick="setActive(this)">
+            <!--<div class="nav-item" onclick="setActive(this)">
                 <span class="icon">⬇</span>
                 Export
                 <span class="badge">soon</span>
-            </div>
+            </div>-->
 
-            <div class="back-btn" onclick="window.close()">← Back to app</div>
+            <!--<div class="back-btn" onclick="window.close()">← Back to app</div>-->
         </nav>
 
         <main class="main">
@@ -1123,7 +1123,7 @@
                 <div class="chart-panel">
                     <div class="chart-header">
                         <span class="panel-title">Points by date</span>
-                        <button class="panel-action">Export ↗</button>
+                       <!-- <button class="panel-action">Export ↗</button> -->
                     </div>
                     <div class="chart-body">
                         <div class="bar-display" id="barDisplay"></div>
@@ -1585,7 +1585,7 @@
             renderMarkers(filtered);
         }
 
-        function clearTimeSlider() {
+        function clearTimeSlider() { //doubled
             timeSliderHour = 0;
             document.getElementById('timeSliderInput').value = 0;
             updateTimeSliderUI();
@@ -1609,7 +1609,7 @@
             renderMarkers(rows);
         }
 
-        function clearTimeSlider() {
+        function clearTimeSlider() { //doubled
             timeSliderHour = 0;
             document.getElementById('timeSliderInput').value = 0;
             updateTimeSliderUI();
