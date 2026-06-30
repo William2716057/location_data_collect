@@ -171,6 +171,139 @@
             margin: 10px 0;
         }
 
+        .date-calendar {
+            display: none;
+            padding: 10px 16px 14px;
+            background: var(--surface2);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+            .date-calendar.open {
+                display: block;
+            }
+
+        .cal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .cal-nav-btn {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-size: 12px;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+            .cal-nav-btn:hover {
+                background: var(--accent);
+                border-color: var(--accent);
+            }
+
+        .cal-month-label {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text);
+            letter-spacing: 0.04em;
+        }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 3px;
+        }
+
+        .cal-dow {
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--muted);
+            text-align: center;
+            padding-bottom: 4px;
+        }
+
+        .cal-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text);
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.15s;
+        }
+
+            .cal-day:hover {
+                background: var(--accent2);
+            }
+
+            .cal-day.empty {
+                cursor: default;
+                pointer-events: none;
+            }
+
+            .cal-day.has-data::after {
+                content: '';
+                position: absolute;
+                bottom: 2px;
+                width: 3px;
+                height: 3px;
+                border-radius: 50%;
+                background: var(--accent);
+            }
+
+            .cal-day.active {
+                background: var(--amber);
+                color: #1a1303;
+                font-weight: 700;
+            }
+
+                .cal-day.active::after {
+                    background: #1a1303;
+                }
+
+        .cal-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border);
+        }
+
+        .cal-selected-label {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--muted);
+        }
+
+        .cal-clear-btn {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--accent);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+            .cal-clear-btn:hover {
+                text-decoration: underline;
+            }
+
         .back-btn {
             margin: auto 16px 0;
             padding: 9px 14px;
@@ -795,7 +928,25 @@
             <div class="nav-item" onclick="setActive(this)">
                 <span class="icon">📅</span>
                 By date
-                <span class="badge">soon</span>
+                <!--<span class="badge">soon</span>-->
+            </div>
+
+            <div class="date-calendar" id="dateCalendar">
+                <div class="cal-header">
+                    <button class="cal-nav-btn" onclick="calStepMonth(-1)">‹</button>
+                    <span class="cal-month-label" id="calMonthLabel">—</span>
+                    <button class="cal-nav-btn" onclick="calStepMonth(1)">›</button>
+                </div>
+                <div class="cal-grid" id="calGrid"></div>
+                <div class="cal-footer">
+                    <span class="cal-selected-label" id="calSelectedLabel">No date selected</span>
+                    <button class="cal-clear-btn" onclick="calClearSelection()">Clear</button>
+                </div>
+            </div>
+
+            <div class="nav-item" id="byDateNavItem" onclick="toggleDateCalendar(this)">
+                <span class="icon">📅</span>
+                By date
             </div>
 
             <div class="nav-item" onclick="setActive(this)">
@@ -897,7 +1048,7 @@
                         <button class="panel-action">Export ↗</button>
                     </div>
                     <div class="chart-body">
-                        <div class="bar-display" id="fakeBars"></div>
+                        <div class="bar-display" id="barDisplay"></div>
                         <div class="chart-empty" id="chartEmpty">
                             <div style="font-size:20px; opacity:0.3; margin-bottom:8px">📊</div>
                             Load data to see chart
@@ -1208,7 +1359,7 @@
             const dates = Object.keys(counts).sort();
             const max = Math.max(...Object.values(counts));
 
-            const container = document.getElementById('fakeBars');
+            const container = document.getElementById('barDisplay');
             container.classList.add('is-live');
             container.innerHTML = dates.map(d => `
                 <div class="chart-bar-wrap${d === activeChartDate ? ' active' : ''}" onclick="onChartBarClick('${d}')" title="${d}: ${counts[d]} point${counts[d] > 1 ? 's' : ''}">
@@ -1235,6 +1386,85 @@
             activeChartDate = d;
             renderChart(allRows);
             renderMarkers(allRows.filter(r => r.date === d));
+        }
+
+        //calendar 
+        let calOpen = false;
+        let calViewYear = new Date().getFullYear();
+        let calViewMonth = new Date().getMonth(); // 0-indexed
+        let calSelectedDate = null; // "YYYY-MM-DD"
+
+        function toggleDateCalendar(el) {
+            calOpen = !calOpen;
+            document.getElementById('dateCalendar').classList.toggle('open', calOpen);
+            el.classList.toggle('active', calOpen);
+            if (calOpen) renderCalendar();
+        }
+
+        function calStepMonth(direction) {
+            calViewMonth += direction;
+            if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
+            if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+            renderCalendar();
+        }
+
+        function pad2(n) { return String(n).padStart(2, '0'); }
+
+        function renderCalendar() {
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('calMonthLabel').textContent =
+                monthNames[calViewMonth] + ' ' + calViewYear;
+
+            const dataCounts = {};
+            if (allRows) {
+                allRows.forEach(r => { dataCounts[r.date] = (dataCounts[r.date] || 0) + 1; });
+            }
+
+            const firstOfMonth = new Date(calViewYear, calViewMonth, 1);
+            const startOffset = firstOfMonth.getDay(); // 0=Sun
+            const daysInMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
+
+            const dow = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+            let html = dow.map(d => `<div class="cal-dow">${d}</div>`).join('');
+
+            for (let i = 0; i < startOffset; i++) {
+                html += `<div class="cal-day empty"></div>`;
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${calViewYear}-${pad2(calViewMonth + 1)}-${pad2(day)}`;
+                const hasData = !!dataCounts[dateStr];
+                const isActive = dateStr === calSelectedDate;
+                const title = hasData ? `${dateStr}: ${dataCounts[dateStr]} point${dataCounts[dateStr] > 1 ? 's' : ''}` : dateStr;
+                html += `<div class="cal-day${hasData ? ' has-data' : ''}${isActive ? ' active' : ''}" title="${title}" onclick="calSelectDate('${dateStr}')">${day}</div>`;
+            }
+
+            document.getElementById('calGrid').innerHTML = html;
+
+            const label = document.getElementById('calSelectedLabel');
+            label.textContent = calSelectedDate ? calSelectedDate : 'No date selected';
+        }
+
+        function calSelectDate(dateStr) {
+            if (!allRows) return;
+
+            if (calSelectedDate === dateStr) {
+                calSelectedDate = null;
+                renderCalendar();
+                renderMarkers(allRows);
+                return;
+            }
+
+            calSelectedDate = dateStr;
+            renderCalendar();
+            renderMarkers(allRows.filter(r => r.date === dateStr));
+        }
+
+        function calClearSelection() {
+            calSelectedDate = null;
+            renderCalendar();
+            if (allRows) renderMarkers(allRows);
         }
     </script>
 </body>
