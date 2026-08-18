@@ -21,3 +21,11 @@ Uses a simple five-column CSV:
 | `Longitude` | Decimal degrees |
 | `Date` | `YYYY-MM-DD` |
 | `Time` | `HH:MM:SS` |
+
+## Use Cases
+ 
+- **Personal location journaling**
+- **Fieldwork and site logging**
+- **Small-scale logistics review**
+- **Activity and route logging**
+- **Teaching tool**
