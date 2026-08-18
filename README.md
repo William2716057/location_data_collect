@@ -7,6 +7,8 @@
 - ability to visualise the data in point, cluster or heatmap form
 - ability to view changes in data over time
 
+<img width="980" height="708" alt="screenshot5" src="https://github.com/user-attachments/assets/b3f76350-8309-45f4-9be8-80195027fb79" />
+
 ### Contents
 - analytics.html
 - location_collect.py
