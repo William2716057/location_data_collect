@@ -1161,7 +1161,7 @@
 
             <div class="bottom-row">
 
-                <div class="chart-panel">
+                <div class="chart-panel" id="chartPanel">
                     <div class="chart-header">
                         <span class="panel-title">Points by date</span>
                         <!-- <button class="panel-action">Export ↗</button> -->
@@ -1177,7 +1177,7 @@
                 </div>
 
                 <!--CSV content bar-->
-                <div               <div class="table-panel" id="tablePanel">
+                <div class="table-panel" id="tablePanel">
                     <div class="table-header">
                         <span class="panel-title">Recent records</span>
                         <div class="header-actions">
@@ -1196,18 +1196,18 @@
                                     <th>Time</th>
                                 </tr>
                             </thead>
-                        <tbody id="tableBody">
-                            <tr>
-                                <td colspan="5" class="muted" style="text-align:center; padding:20px">
-                                    No data loaded
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                            <tbody id="tableBody">
+                                <tr>
+                                    <td colspan="5" class="muted" style="text-align:center; padding:20px">
+                                        No data loaded
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-            </div>
-        </main>
+                </div>
+</main>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
