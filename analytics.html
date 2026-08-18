@@ -789,6 +789,47 @@
             justify-content: space-between;
         }
 
+        /*panel minimise buttons*/
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .minimize-btn {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            color: var(--muted);
+            font-family: var(--mono);
+            font-size: 12px;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+
+            .minimize-btn:hover {
+                color: var(--text);
+                border-color: var(--accent);
+                background: rgba(59,130,246,0.12);
+            }
+
+        .chart-panel.collapsed .chart-body {
+            display: none;
+        }
+
+        .table-panel.collapsed .table-scroll {
+            display: none;
+        }
+
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -1123,7 +1164,8 @@
                 <div class="chart-panel">
                     <div class="chart-header">
                         <span class="panel-title">Points by date</span>
-                       <!-- <button class="panel-action">Export ↗</button> -->
+                        <!-- <button class="panel-action">Export ↗</button> -->
+                        <button class="minimize-btn" id="chartMinBtn" onclick="togglePanel('chart')" title="Minimize">–</button>
                     </div>
                     <div class="chart-body">
                         <div class="bar-display" id="barDisplay"></div>
@@ -1135,21 +1177,25 @@
                 </div>
 
                 <!--CSV content bar-->
-                <div class="table-panel">
+                <div               <div class="table-panel" id="tablePanel">
                     <div class="table-header">
                         <span class="panel-title">Recent records</span>
-                        <button class="panel-action">View all</button>
+                        <div class="header-actions">
+                            <!--<button class="panel-action">View all</button>-->
+                            <button class="minimize-btn" id="tableMinBtn" onclick="togglePanel('table')" title="Minimize">–</button>
+                        </div>
                     </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Latitude</th>
-                                <th>Longitude</th>
-                                <th>Date</th>
-                                <th>Time</th>
-                            </tr>
-                        </thead>
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Latitude</th>
+                                    <th>Longitude</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
                         <tbody id="tableBody">
                             <tr>
                                 <td colspan="5" class="muted" style="text-align:center; padding:20px">
@@ -1207,8 +1253,24 @@
         let lastRows = null;
         let allRows = null;
 
-        //date slide
+        //lower panel maximise/minimize
+        const collapsedState = { chart: false, table: false };
+        let baseMapHeight = null;
+        const EXPAND_PER_PANEL = 170; // height change (adjust here)
 
+        function togglePanel(which) {
+            const panelEl = document.getElementById(which === 'chart' ? 'chartPanel' : 'tablePanel');
+            const btn = document.getElementById(which === 'chart' ? 'chartMinBtn' : 'tableMinBtn');
+
+            collapsedState[which] = !collapsedState[which];
+            panelEl.classList.toggle('collapsed', collapsedState[which]);
+            btn.textContent = collapsedState[which] ? '+' : '–';
+            btn.title = collapsedState[which] ? 'Expand' : 'Minimize';
+
+            updateMapHeight();
+        }
+
+        //date slide
         let uniqueDates = [];
         let dateIndex = -1;   // -1 means "no filter, show all"
 
@@ -1221,6 +1283,34 @@
             }).addTo(map);
             markerLayer = L.layerGroup().addTo(map);
         }
+
+        function updateMapHeight() {
+            const mapPlaceholder = document.getElementById('mapPlaceholder');
+            if (baseMapHeight === null) {
+                baseMapHeight = mapPlaceholder.getBoundingClientRect().height;
+            }
+
+            const collapsedCount = (collapsedState.chart ? 1 : 0) + (collapsedState.table ? 1 : 0);
+            const maxAllowed = window.innerHeight * 0.8;
+            const targetHeight = Math.min(baseMapHeight + (collapsedCount * EXPAND_PER_PANEL), maxAllowed);
+
+            mapPlaceholder.style.height = targetHeight + 'px';
+
+            if (map) {
+                setTimeout(() => map.invalidateSize(), 260);
+            }
+        }
+
+        function initMap() {
+            if (map) return;
+            map = L.map('map', { zoomControl: true, attributionControl: false })
+                .setView([-27.4698, 153.0251], 12);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                maxZoom: 19,
+            }).addTo(map);
+            markerLayer = L.layerGroup().addTo(map);
+        }
+
 
 
         function clearLayers() {
@@ -1615,6 +1705,10 @@
             updateTimeSliderUI();
             applyCombinedFilter();
         }
+
+        window.addEventListener('resize', () => {
+            if (collapsedState.chart || collapsedState.table) updateMapHeight();
+        });
 
     </script>
 </body>
